@@ -46,6 +46,23 @@ func GetSubs(
 	return subs, result.Error
 }
 
+func GetSubsById(
+	db gorm.DB,
+	userID int,
+) ([]Subcription, error) {
+	var subs []Subcription
+	result := db.First(&subs, "UserID = ?", userID)
+	return subs, result.Error
+}
+
+func UpdateSubs(
+	db gorm.DB,
+	userID int,
+) error {
+	var sub Subcription
+	db.Model(&sub).Update()
+}
+
 func CreateDB() gorm.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.User, config.Password, config.DBname)
