@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -58,9 +59,43 @@ func GetSubsById(
 func UpdateSubs(
 	db gorm.DB,
 	userID int,
-) error {
+	field string,
+	value interface{},
+) bool {
 	var sub Subcription
-	db.Model(&sub).Update()
+	db.Model(&sub).Update(field, value)
+	return true
+}
+
+func DeleteSubs(
+	db gorm.DB,
+	userID int,
+) error {
+	ctx := context.Background()
+	_, err := gorm.G[Subcription](&db).Where("userID = ?", userID).Delete(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func GetTotalPrice(
+	db gorm.DB,
+	userID string,
+	serviceName string,
+	startDate, endDate time.Time,
+) (int, error) {
+	var total int64
+	query := db.Model(&Subcription{}).Where("start_date >= ? AND start_date <= ?", startDate, endDate)
+	if userID != "" {
+		query = query.Where("user_id = ?", userID)
+	}
+	if serviceName != "" {
+		query = query.Where("service_name = ?", serviceName)
+	}
+	err := query.Select("SUM(price)").Scan(&total).Error
+	return int(total), err
 }
 
 func CreateDB() gorm.DB {

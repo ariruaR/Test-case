@@ -1,0 +1,176 @@
+basePath: /
+definitions:
+  main.ChangeData:
+    properties:
+      field:
+        type: string
+      value: {}
+    type: object
+  main.Data:
+    properties:
+      end_date:
+        type: string
+      service_name:
+        type: string
+      start_date:
+        type: string
+    type: object
+  models.Subcription:
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для управления подписками и подсчёта их стоимости
+  title: Subscription API
+  version: "1.0"
+paths:
+  /subs:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получить все подписки
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные подписки
+        in: body
+        name: sub
+        required: true
+        schema:
+          $ref: '#/definitions/models.Subcription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Subcription'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Создать подписку
+      tags:
+      - subscriptions
+  /subs/{userID}:
+    delete:
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Удалить подписку пользователя
+      tags:
+      - subscriptions
+    get:
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Subcription'
+            type: array
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получить подписки пользователя
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: userID
+        required: true
+        type: integer
+      - description: Изменяемое поле
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/main.ChangeData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Изменить подписку пользователя
+      tags:
+      - subscriptions
+  /subs/price/{userID}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: 'Фильтры: название сервиса, даты'
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/main.Data'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Получить суммарную стоимость подписок
+      tags:
+      - subscriptions
+swagger: "2.0"
