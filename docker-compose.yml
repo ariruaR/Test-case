@@ -1,0 +1,35 @@
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: exampledb
+      POSTGRES_USER: exampleuser
+      POSTGRES_PASSWORD: examplepass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      PSQL_HOST: db
+      PSQL_PORT: 5432
+      PSQL_USER: exampleuser
+      PSQL_PASSWORD: examplepass
+      PSQL_DBNAME: exampledb
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./components:/root/components
+      - ./docs:/root/docs
+      - ./.env:/root/.env
+
+volumes:
+  pgdata:
